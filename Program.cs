@@ -1,10 +1,19 @@
+using Microsoft.EntityFrameworkCore;
 using RegistrosTecnico.Components;
+using RegistrosTecnico.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+//Inyeccción del contexto
+var ConStr = builder.Configuration.GetConnectionString("ConStr");
+builder.Services.AddDbContext<Contexto>(c => c.UseSqlite(ConStr));
+builder.Services.AddBlazorBootstrap();
+
+
 
 var app = builder.Build();
 
