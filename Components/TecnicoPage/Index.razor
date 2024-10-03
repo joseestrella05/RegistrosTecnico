@@ -42,7 +42,7 @@
                         <th>T&eacute;cnicoId</th>
                         <th>Nombres</th>
                         <th>Sueldo por hora</th>
-                        <th>Detalles</th>
+                        <th>Ver</th>
                         <th>Modificar</th>
                         <th>Eliminar</th>
                     </tr>
@@ -55,13 +55,13 @@
                             <td>@tecnico.Nombres</td>
                             <td>@tecnico.SueldoHora.ToString("N2")</td>
                             <td class="text-center">
-                                <a href="/Tecnico/Details/@tecnico.TecnicoId" class="btn btn-primary bi bi-binoculars-fill">  Detalles</a>
+                                <a href="/Tecnico/Details/@tecnico.TecnicoId" class="btn btn-primary bi bi-eye btn-radius">  ver</a>
                             </td>
                             <td class="text-center">
-                                <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-secondary bi bi-pencil-fill">  Modificar</a>
+                                <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-secondary bi bi-pencil-fill btn-radius">  Modificar</a>
                             </td>
                             <td class="text-center">
-                                <a href="/Tecnico/Delete/@tecnico.TecnicoId" class="btn btn-danger bi bi-trash-fill">  Eliminar</a>
+                                <a href="/Tecnico/Delete/@tecnico.TecnicoId" class="btn btn-danger bi bi-trash-fill btn-radius">  Eliminar</a>
                             </td>
                         </tr>
                     }

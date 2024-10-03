@@ -49,3 +49,13 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.toast-container {
+    position: fixed; 
+    z-index: 1050;
+}
+
+
+.btn-radius {
+    border-radius: 20px;
+}

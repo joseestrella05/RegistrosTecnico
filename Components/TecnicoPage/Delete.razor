@@ -1,0 +1,77 @@
+﻿@page "/Tecnico/Delete/{tecnicosId:int}"
+@inject TecnicoService tecnicoservice
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+
+<PageTitle>Eliminar técnicos</PageTitle>
+
+@if (tecnico != null)
+{
+    @*Header*@
+    <div class="card-header bg-primary text-white text-center">
+        <h3><strong>Eliminar t&eacute;cnico</strong></h3>
+    </div>
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-body">
+                <h5><strong>¿Estás seguro de que quieres eliminar este técnico?</strong></h5>
+                <div class="mb-1">
+                    <p class="mb-0">TécnicoId: @tecnico.TecnicoId</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Nombres: @tecnico.Nombres</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Sueldo por hora: @tecnico.SueldoHora</p>
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer">
+                <a type="button" href="/Tecnico/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No se encontró ningún técnico con ese ID</p>
+}
+
+<div>@Mensaje</div>
+
+@code {
+    [Parameter]
+    public int tecnicosId { get; set; }
+    public Tecnicos tecnico { get; set; }
+    public string Mensaje = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (tecnicosId > 0)
+        {
+            tecnico = await tecnicoservice.Buscar(tecnicosId);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        if (tecnico != null)
+        {
+            var eliminar = await tecnicoservice.Eliminar(tecnicosId);
+            if (eliminar)
+            {
+                Mensaje = "Técnico eliminado";
+                navigation.NavigateTo("/Tecnico/Index");
+            }
+            else
+            {
+                Mensaje = "Error, técnico no eliminado";
+            }
+        }
+    }
+
+}

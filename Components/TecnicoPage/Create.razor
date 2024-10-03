@@ -1,0 +1,81 @@
+﻿@page "/Tecnico/Create"
+@rendermode InteractiveServer
+@inject TecnicoService tecnicoService
+@inject NavigationManager navigation
+
+<PageTitle>Guardar nuevo t&eacute;cnico</PageTitle>
+<EditForm Model="tecnico"  OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <Toasts class="p-3" Messages="MensajeToast" Placement="ToastsPlacement.TopRight" />
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-header bg-primary text-white text-center">
+                <h2><strong>Crear nuevo t&eacute;cnico</strong></h2>
+            </div>
+            @*Body*@
+            <div class="card-body">
+                @*Id*@
+                <label class="form-label" for="id"><strong>T&eacute;cnicoId</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="tecnico.TecnicoId" READONLY></InputNumber>
+
+                @*Nombres*@
+                <label class="form-label" for="nombres"><strong>Nombres</strong></label>
+                <InputText id="nombres" class="form-control" @bind-Value="tecnico.Nombres"></InputText>
+                <ValidationMessage For="@(()=> tecnico.Nombres)"></ValidationMessage>
+
+                @*SueldoHora*@
+                <label class="form-label" for="sueldo"><strong>Sueldo por hora</strong></label>
+                <InputNumber id="sueldo" class="form-control" @bind-Value="tecnico.SueldoHora"></InputNumber>
+                <ValidationMessage For="@(()=> tecnico.SueldoHora)"></ValidationMessage>
+
+            </div>
+            @*Footer*@
+            <div class="card-footer">
+                <a type="button" href="/Tecnico/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="submit" class="btn btn-success bi bi-floppy-fill">  Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Tecnicos tecnico { get; set; } = new Tecnicos();
+    public bool NombreRepetido { get; set; }
+    List<ToastMessage> MensajeToast = new List<ToastMessage>();
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Notificación",
+            HelpText = $"{DateTime.Now}",
+            Message = mensaje,
+        };
+
+    private void Mensaje(ToastType toastType, string mensaje)
+    {
+        MensajeToast.Add(CreateToastMessage(toastType, mensaje));
+    }
+
+
+    public async Task Crear()
+    {
+        if (!await Validar())
+        {
+            await tecnicoService.Guardar(tecnico);
+            Mensaje(ToastType.Success, "Técnico guardado correctamente.");
+            tecnico = new Tecnicos();
+        }
+        else
+        {
+            Mensaje(ToastType.Danger, "Ya existe un técnico con ese nombre.");
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeTecnico = await tecnicoService.BuscarNombres(tecnico.Nombres);
+        return existeTecnico != null;
+    }
+}
