@@ -1,0 +1,97 @@
+﻿@page "/Tecnico/Edit"
+@page "/Tecnico/Edit/{tecnicosId:int}"
+@rendermode InteractiveServer
+@inject TecnicoService tecnicoService
+@inject NavigationManager navigation
+
+<PageTitle>Editar técnico</PageTitle>
+<EditForm Model="tecnico" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <Toasts class="p-3" Messages="MensajeToast" Placement="ToastsPlacement.TopRight" />
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-header bg-primary text-white">
+                <h2><strong>Modificar técnico</strong></h2>
+            </div>
+            @*Body*@
+            <div class="card-body">
+                @*Id*@
+                <label class="form-label" for="id"><strong>TécnicoId</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="tecnico.TecnicoId" readonly></InputNumber>
+
+                @*Nombres*@
+                <label class="form-label" for="nombres"><strong>Nombres</strong></label>
+                <InputText id="nombres" class="form-control" @bind-Value="tecnico.Nombres"></InputText>
+                <ValidationMessage For="@(() => tecnico.Nombres)"></ValidationMessage>
+
+                @*SueldoHora*@
+                <label class="form-label" for="sueldo"><strong>Sueldo por hora</strong></label>
+                <InputNumber id="sueldo" class="form-control" @bind-Value="tecnico.SueldoHora"></InputNumber>
+                <ValidationMessage For="@(() => tecnico.SueldoHora)"></ValidationMessage>
+
+               
+            </div>
+            @*Footer*@
+            <div class="card-footer">
+                <a type="button" href="/Tecnico/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="submit" class="btn btn-success bi bi-pencil-fill"> Modificar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int tecnicosId { get; set; }
+    public Tecnicos tecnico { get; set; } = new Tecnicos();
+   
+    public bool NombreRepetido { get; set; }
+    List<ToastMessage> MensajeToast = new List<ToastMessage>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (tecnicosId > 0)
+        {
+            tecnico = await tecnicoService.Buscar(tecnicosId);
+        }
+   
+    }
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Notificación",
+            HelpText = $"{DateTime.Now}",
+            Message = mensaje,
+        };
+
+    private void Mensaje(ToastType toastType, string mensaje)
+    {
+        MensajeToast.Add(CreateToastMessage(toastType, mensaje));
+    }
+
+    public async Task Modificar()
+    {
+        if (!await Validar())
+        {
+            await tecnicoService.Guardar(tecnico);
+            Mensaje(ToastType.Success, "Técnico modificado correctamente.");
+        }
+        else
+        {
+            Mensaje(ToastType.Danger, "Ya existe un técnico con ese nombre.");
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeTecnico = await tecnicoService.BuscarNombres(tecnico.Nombres);
+
+        NombreRepetido = existeTecnico != null;
+        return NombreRepetido;
+    }
+
+   
+}
