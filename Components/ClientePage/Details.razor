@@ -1,0 +1,55 @@
+﻿@page "/Cliente/Details/{ClienteId:int}"
+@inject ClientesServices clienteService
+@inject NavigationManager navigation
+
+<PageTitle>Destalles del t&eacute;cnico</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        @*Header*@
+        <div class="card-header bg-primary text-white text-center">
+            <h3><strong>Destalles del Cliente</strong></h3>
+        </div>
+        @*Body*@
+        <div class="card-body">
+            <h5><strong>Estos son los detalles del Cliente</strong></h5>
+            @if (cliente != null)
+            {
+                @*Datos*@
+                <div class="mb-1">
+                    <p class="mb-0">Cliente: @cliente.ClientesId</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Nombre: @cliente.Nombres</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">WhatsApp: @cliente.WhatsApp</p>
+                </div>
+            }
+            else
+            {
+                <p>No se encontr&oacute; ning&uacute;n Cliente con el ID especificado.</p>
+            }
+
+        </div>
+        @*Footer*@
+        <div class="card-footer">
+            <a type="button" href="/Cliente/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+
+        </div>
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes cliente { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        cliente = await clienteService.Buscar(ClienteId);
+    }
+
+}
