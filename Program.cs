@@ -16,6 +16,7 @@ builder.Services.AddBlazorBootstrap();
 
 //Inyeccción del service
 builder.Services.AddScoped<TecnicoService>();
+builder.Services.AddScoped<TiposTecnicoServices>();
 
 
 
