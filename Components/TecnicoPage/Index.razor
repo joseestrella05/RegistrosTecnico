@@ -1,6 +1,7 @@
 ﻿@page "/Tecnico/Index"
 @rendermode InteractiveServer
 @inject TecnicoService tecnicoService
+@inject TiposTecnicoServices tiposTecnicoServices
 @inject NavigationManager navigation
 
 <PageTitle>T&eacute;cnicos</PageTitle>
@@ -18,6 +19,7 @@
                     <option value="id">T&eacute;cnicoId</option>
                     <option value="Nombres">Nombres</option>
                     <option value="SueldoHora">SueldoHora</option>
+                    <option value="Descripcion">Tipo de t&eacute;cnico</option>
                 </InputSelect>
             </div>
             <div class="col-md-7">
@@ -42,6 +44,7 @@
                         <th>T&eacute;cnicoId</th>
                         <th>Nombres</th>
                         <th>Sueldo por hora</th>
+                        <th>Tipo de t&eacute;cnico</th>
                         <th>Ver</th>
                         <th>Modificar</th>
                         <th>Eliminar</th>
@@ -50,18 +53,20 @@
                 <tbody>
                     @foreach (var tecnico in tecnicos)
                     {
+                        var tipoTecnico = ListaTipos.FirstOrDefault(tp => tp.TipoId == tecnico.TipoId);
                         <tr>
                             <td>@tecnico.TecnicoId</td>
                             <td>@tecnico.Nombres</td>
+                            <td>@(tipoTecnico?.Descripcion ?? "no encontrado")</td>
                             <td>@tecnico.SueldoHora.ToString("N2")</td>
                             <td class="text-center">
-                                <a href="/Tecnico/Details/@tecnico.TecnicoId" class="btn btn-primary bi bi-eye btn-radius">  ver</a>
+                                <a href="/Tecnico/Details/@tecnico.TecnicoId" class="btn btn-primary bi bi-eye btn-radius"></a>
                             </td>
                             <td class="text-center">
-                                <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-secondary bi bi-pencil-fill btn-radius">  Modificar</a>
+                                <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-secondary bi bi-pencil-fill btn-radius"></a>
                             </td>
                             <td class="text-center">
-                                <a href="/Tecnico/Delete/@tecnico.TecnicoId" class="btn btn-danger bi bi-trash-fill btn-radius">  Eliminar</a>
+                                <a href="/Tecnico/Delete/@tecnico.TecnicoId" class="btn btn-danger bi bi-trash-fill btn-radius"></a>
                             </td>
                         </tr>
                     }
@@ -74,12 +79,14 @@
 
 @code {
     public List<Tecnicos> tecnicos = new List<Tecnicos>();
+    public List<TiposTecnicos> ListaTipos { get; set; } = new List<TiposTecnicos>();
     private string filtro = "";
     private string valorFiltro = "";
 
     protected override async Task OnInitializedAsync()
     {
         tecnicos = await tecnicoService.Listar(t => true);
+        ListaTipos = await tiposTecnicoServices.Listar(t => true);
         
     }
 
@@ -98,6 +105,12 @@
             else if (filtro == "SueldoHora" && float.TryParse(valorFiltro, out float SueldoHora))
             {
                 tecnicos = await tecnicoService.Listar(t => t.SueldoHora == SueldoHora);
+            }
+            else if (filtro == "Descripcion")
+            {
+                var tiposIguales = await tiposTecnicoServices.Listar(t => t.Descripcion.ToLower().Contains(valorFiltro.ToLower()));
+                var tiposIdsIguales = tiposIguales.Select(t => t.TipoId).ToList();
+                tecnicos = await tecnicoService.Listar(t => tiposIdsIguales.Contains(t.TipoId));
             }
            
         }
