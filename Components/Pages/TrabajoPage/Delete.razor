@@ -1,0 +1,68 @@
+﻿@page "/Trabajo/Delete/{TrabajoId:int}"
+@rendermode InteractiveServer
+@inject TrabajoService trabajoService
+@inject NavigationManager navigation
+
+<PageTitle>Eliminar Trabajo</PageTitle>
+
+@if (Trabajo != null)
+{
+    @*Header*@
+    <div class="card-header bg-primary text-white text-center">
+        <h3><strong>Eliminar t&eacute;cnico</strong></h3>
+    </div>
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-body">
+                <h5><strong>¿Estás seguro de que quieres eliminar este Trabajo?</strong></h5>
+                <div class="mb-1">
+                    <p class="mb-0">TrabajoId: @Trabajo.TrabajoId</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Nombres: @Trabajo.Fecha</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Cliente: @Trabajo.Cliente.Nombres</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">T&eacute;cnico: @Trabajo.Tecnicos.Nombres</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Descripci&oacute;n: @Trabajo.Descripcion</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Monto: @Trabajo.Monto</p>
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer">
+                <a type="button" href="/Trabajo/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No se encontró ningún trabajo con ese ID</p>
+}
+
+@code {
+    [Parameter]
+    public int TrabajoId { get; set; }
+    Trabajos Trabajo { get; set; } = new Trabajos();
+    protected override async Task OnInitializedAsync()
+    {
+        Trabajo = await trabajoService.Buscar(TrabajoId);
+    }
+
+    public async Task Eliminar()
+    {
+
+        await trabajoService.Eliminar(Trabajo.TrabajoId);
+        navigation.NavigateTo("/RegistroTrabajos/index");
+
+    }
+  
+}
