@@ -3,6 +3,7 @@
 @inject TecnicoService tecnicoService
 @inject TrabajoService trabajoService
 @inject ClientesServices clienteService
+@inject PrioridadService prioridadService
 @inject NavigationManager navigation
 
 <PageTitle>Editar Trabajo</PageTitle>
@@ -51,6 +52,15 @@
                 <InputText @bind-Value="Trabajo.Descripcion" class="form-control" />
                 <ValidationMessage For="@(() => Trabajo.Descripcion)" />
 
+                <label class="form-label">Prioridad</label>
+                <InputSelect @bind-Value="Trabajo.PrioridadId" class="form-control">
+                    <option value="0">Seleciona una prioridad</option>
+                    @foreach (var Prioridad in prioridades)
+                    {
+                        <option value="@Prioridad.PrioridadId">@Prioridad.Descripcion</option>
+                    }
+                </InputSelect>
+                
                 @*Monto*@
                 <label class="form-label" for="monto">Monto</label>
                 <InputNumber @bind-Value="Trabajo.Monto" class="form-control" />
@@ -77,6 +87,7 @@
     public Trabajos Trabajo { get; set; } = new Trabajos();
     public List<Tecnicos> Tecnicos = new List<Tecnicos>();
     public List<Clientes> Clientes = new List<Clientes>();
+    public List<Prioridades> prioridades = new List<Prioridades>();
 
 
     protected override async Task OnInitializedAsync()
@@ -84,6 +95,7 @@
         Trabajo = await trabajoService.Buscar(TrabajoId);
         Tecnicos = await tecnicoService.Listar(a => true);
         Clientes = await clienteService.Listar(a => true);
+        prioridades = await prioridadService.Listar(a => true);
     }
     public async Task Modificar()
     {
