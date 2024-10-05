@@ -25,4 +25,9 @@ public class Trabajos
     [Required(ErrorMessage = "Debe de elegir un cliente")]
     public int? ClienteId { get; set; }
     public Clientes? Cliente { get; set; }
+
+    [ForeignKey("Prioridades")]
+    [Required(ErrorMessage = "Debe elegir una prioridad")]
+    public int PrioridadId { get; set; }
+    public Prioridades? Prioridades { get; set; }
 }
