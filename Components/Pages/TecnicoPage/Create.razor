@@ -1,6 +1,7 @@
 ﻿@page "/Tecnico/Create"
 @rendermode InteractiveServer
 @inject TecnicoService tecnicoService
+@inject TiposTecnicoServices tiposTecnicoService
 @inject NavigationManager navigation
 
 <PageTitle>Guardar nuevo t&eacute;cnico</PageTitle>
@@ -24,10 +25,26 @@
                 <InputText id="nombres" class="form-control" @bind-Value="tecnico.Nombres"></InputText>
                 <ValidationMessage For="@(()=> tecnico.Nombres)"></ValidationMessage>
 
+
+                @*TipoTecnico*@
+                <label class="form-label">Tipo de T&eacute;cnico</label>
+                <div>
+                    <InputSelect @bind-Value="tecnico.TipoId" class="form-control">
+                        <option value="0">Seleciona el tipo de t&eacute;cnico</option>
+                        @foreach (var tipo in ListaTipos)
+                        {
+                            <option value="@tipo.TipoId">@tipo.Descripcion</option>
+                        }
+                    </InputSelect>
+                </div>
+
                 @*SueldoHora*@
                 <label class="form-label" for="sueldo"><strong>Sueldo por hora</strong></label>
                 <InputNumber id="sueldo" class="form-control" @bind-Value="tecnico.SueldoHora"></InputNumber>
                 <ValidationMessage For="@(()=> tecnico.SueldoHora)"></ValidationMessage>
+
+
+
 
             </div>
             @*Footer*@
@@ -41,8 +58,14 @@
 
 @code {
     public Tecnicos tecnico { get; set; } = new Tecnicos();
+    public List<TiposTecnicos> ListaTipos { get; set; } = new List<TiposTecnicos>();
     public bool NombreRepetido { get; set; }
     List<ToastMessage> MensajeToast = new List<ToastMessage>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTipos = await tiposTecnicoService.Listar(t => true);
+    }
 
     private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
     => new ToastMessage

@@ -1,0 +1,110 @@
+﻿@page "/Prioridad/Edit/{PrioridadId:int}"
+@inject PrioridadService PrioridadService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Modificar Prioridad</PageTitle>
+<EditForm Model="Prioridad" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow-lg border-0 rounded" style="background-color: #f8f9fa;">
+        <div class="card-header bg-primary text-white" style="text-align: center;">
+            <h3> <i class="fas fa-clipboard-list"></i> Editar Prioridades</h3>
+        </div>
+
+        <div class="card-body">
+            @* PrioridadId *@
+            <label class="form-label" for="id"><strong>T&eacute;cnicoId</strong></label>
+            <InputNumber id="id" class="form-control" @bind-Value=Prioridad.PrioridadId READONLY></InputNumber>
+
+            @* Descripcion *@
+            <label class="form-label" for="descripcion"><strong>Descripci&oacute;n</strong></label>
+            <InputText id="descripcion" class="form-control" @bind-Value="Prioridad.Descripcion"></InputText>
+            <ValidationMessage For="@(()=> Prioridad.Descripcion)"></ValidationMessage>
+
+            @* Tiempo *@
+            <label class="form-label" for="Tiempo"><strong>Tiempo</strong></label>
+            <InputNumber id="Tiempo" class="form-control" @bind-Value="Prioridad.Tiempo"></InputNumber>
+
+        </div>
+
+
+        <div class="card-footer bg-light d-flex justify-content-center mt-3">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary ml-2" @onclick="Nuevo"><span class="bi bi-plus"></span> Nuevo </button>
+                <button type="submit" class="btn btn-outline-success ml-2"><span class="bi bi-check-circle-fill"></span> Guardar </button>
+                <a type="button" href="/Prioridad/Index/" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int? PrioridadId { get; set; }
+    public Prioridades Prioridad { get; set; } = new Prioridades();
+    private bool Existe = false;
+    List<ToastMessage> MensajeToast = new List<ToastMessage>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PrioridadId.HasValue)
+        {
+            Prioridad.PrioridadId = PrioridadId.Value;
+            await Buscar();
+        }
+    }
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
+       => new ToastMessage
+       {
+           Type = toastType,
+           Title = "Notificación",
+           HelpText = $"{DateTime.Now}",
+           Message = mensaje,
+       };
+
+    private void Mensaje(ToastType toastType, string mensaje)
+    {
+        MensajeToast.Add(CreateToastMessage(toastType, mensaje));
+    }
+
+    public void Nuevo()
+    {
+        Prioridad = new Prioridades();
+        Existe = false;
+    }
+
+    public async Task Buscar()
+    {
+        var prioridadEncontrada = await PrioridadService.Buscar(Prioridad.PrioridadId);
+
+        if (prioridadEncontrada != null)
+        {
+            Prioridad = prioridadEncontrada;
+        }
+
+    }
+
+    public async Task<bool> Validar()
+    {
+        Existe = await PrioridadService.Existe(Prioridad.PrioridadId, Prioridad.Descripcion);
+        return !Existe;
+    }
+
+    public async Task Guardar()
+    {
+        if (!await Validar())
+        {
+            return;
+        }
+
+        var guardo = await PrioridadService.Guardar(Prioridad);
+        if (guardo)
+        {
+            Mensaje(ToastType.Success, "Prioridad modificada correctamente.");
+            Nuevo();
+        }
+    }
+
+}

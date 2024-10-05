@@ -1,0 +1,77 @@
+﻿@page "/Cliente/Delete/{ClienteId:int}"
+@inject ClientesServices clienteService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Cliente</PageTitle>
+
+@if (cliente != null)
+{
+    @*Header*@
+    <div class="card-header bg-primary text-white text-center">
+        <h3><strong>Eliminar Cliente</strong></h3>
+    </div>
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-body">
+                <h5><strong>¿Estás seguro de que quieres eliminar este Cliente</strong></h5>
+                <div class="mb-1">
+                    <p class="mb-0">TécnicoId: @cliente.ClientesId</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Nombres: @cliente.Nombres</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Sueldo por hora: @cliente.WhatsApp</p>
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer">
+                <a type="button" href="/Cliente/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="button" class="btn btn-danger bi bi-trash-fill" @onclick="Eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No se encontró ningún cliente con ese ID</p>
+}
+
+<div>@Mensaje</div>
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes cliente { get; set; }
+
+    public string Mensaje = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (ClienteId > 0)
+        {
+            cliente = await clienteService.Buscar(ClienteId);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        if (cliente != null)
+        {
+            var eliminar = await clienteService.Eliminar(ClienteId);
+            if (eliminar)
+            {
+                Mensaje = "cliente eliminado";
+                navigation.NavigateTo("/Cliente/Index");
+            }
+            else
+            {
+                Mensaje = "Error, cliente no eliminado";
+            }
+        }
+    }
+
+}

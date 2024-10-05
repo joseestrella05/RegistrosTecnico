@@ -1,0 +1,95 @@
+﻿@page "/Cliente/Edit/{ClienteId:int}"
+@rendermode InteractiveServer
+@inject ClientesServices clienteService
+@inject NavigationManager navigation
+
+<PageTitle>Editar Cliente</PageTitle>
+<EditForm Model="cliente" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <Toasts class="p-3" Messages="MensajeToast" Placement="ToastsPlacement.TopRight" />
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-header bg-primary text-white text-center">
+                <h2><strong>Modificar Cliente</strong></h2>
+            </div>
+            @*Body*@
+            <div class="card-body">
+                @*Id*@
+                <label class="form-label" for="id"><strong>ClienteId</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="cliente.ClientesId" readonly></InputNumber>
+
+                @*Nombres*@
+                <label class="form-label" for="nombres"><strong>Nombre</strong></label>
+                <InputText id="nombres" class="form-control" @bind-Value="cliente.Nombres"></InputText>
+                <ValidationMessage For="@(() => cliente.Nombres)"></ValidationMessage>
+
+
+                @*SueldoHora*@
+                <label class="form-label" for="sueldo"><strong>WhatsApp</strong></label>
+                <InputText id="sueldo" class="form-control" @bind-Value="cliente.WhatsApp"></InputText>
+                <ValidationMessage For="@(() => cliente.WhatsApp)"></ValidationMessage>
+
+            </div>
+            @*Footer*@
+            <div class="card-footer">
+                <a type="button" href="/Cliente/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="submit" class="btn btn-success bi bi-pencil-fill"> Modificar</button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes cliente { get; set; } = new Clientes();
+    List<ToastMessage> MensajeToast = new List<ToastMessage>();
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Notificación",
+            HelpText = $"{DateTime.Now}",
+            Message = mensaje,
+        };
+
+    private void Mensaje(ToastType toastType, string mensaje)
+    {
+        MensajeToast.Add(CreateToastMessage(toastType, mensaje));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            cliente = await clienteService.Buscar(ClienteId);
+        }
+
+    }
+
+    public async Task Modificar()
+    {
+        if (!await Validar())
+        {
+            await clienteService.Guardar(cliente);
+            Mensaje(ToastType.Success, "Cliente Editado correctamente.");
+            navigation.NavigateTo("/Cliente/index");
+
+        }
+        else
+        {
+            Mensaje(ToastType.Danger, "No se pudo modificar el Cliente .");
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeCliente = await clienteService.BuscarNombres(cliente.Nombres);
+        return existeCliente != null;
+    }
+}

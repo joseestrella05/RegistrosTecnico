@@ -1,0 +1,89 @@
+﻿@page "/Cliente/Create"
+@rendermode InteractiveServer
+@inject ClientesServices clienteService
+@inject NavigationManager navigation
+
+<EditForm Model="cliente" OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <Toasts class="p-3" Messages="MensajeToast" Placement="ToastsPlacement.TopRight" />
+    <div class="container">
+        <div class="card shadow-lg">
+            @*header*@
+            <div class="card-header bg-primary text-white text-center">
+                <h2><strong>Crear Cliente</strong></h2>
+            </div> 
+            @*Body*@
+            <div class="card-body">
+                @*Id*@
+                <label class="form-label" for="id"><strong>ClienteId</strong></label>
+                <InputNumber id="id" class="form-control" @bind-Value="cliente.ClientesId" readonly></InputNumber>
+
+                @*Nombre*@
+                <label class="form-label" for="Nombre"><strong>Nombre</strong></label>
+                <InputText id="nombres" class="form-control" @bind-Value="cliente.Nombres"></InputText>
+                <ValidationMessage For="@(() => cliente.Nombres)"></ValidationMessage>
+
+                @*WhatsApp*@
+                <label class="form-label" for="WhatsApp"><strong>WhatsApp</strong></label>
+                <InputText id="WhatsApp" class="form-control" @bind-Value="cliente.WhatsApp"></InputText>
+                <ValidationMessage For="@(() => cliente.WhatsApp)"></ValidationMessage>
+
+                <div>
+                    @*footer*@
+                    <div class="card-footer">
+                        <a type="button" href="/Cliente/Index" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                        <button type="submit" class="btn btn-success bi bi-floppy-fill">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+
+@code {
+    public Clientes cliente { get; set; } = new Clientes();
+    public List<Clientes> ListaCliente { get; set; } = new List<Clientes>();
+    public bool NombreRepetido { get; set; }
+    List<ToastMessage> MensajeToast = new List<ToastMessage>();
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Notificación",
+            HelpText = $"{DateTime.Now}",
+            Message = mensaje,
+        };
+
+    private void Mensaje(ToastType toastType, string mensaje)
+    {
+        MensajeToast.Add(CreateToastMessage(toastType, mensaje));
+    }
+
+    public async Task Crear()
+    {
+        if (!await Validar())
+        {
+            await clienteService.Guardar(cliente);
+            Mensaje(ToastType.Success, "Cliente guardado correctamente.");
+            cliente = new Clientes();
+        }
+
+        else
+        {
+            Mensaje(ToastType.Danger, "Ya existe un CLiente con esa descripción.");
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeCliente = await clienteService.BuscarNombres(cliente.Nombres);
+        return existeCliente != null;
+
+
+
+    }
+}

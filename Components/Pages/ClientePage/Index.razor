@@ -1,0 +1,111 @@
+﻿@page "/Cliente/index"
+@rendermode InteractiveServer
+@inject ClientesServices clienteService
+@inject NavigationManager navigation
+
+<PageTitle>Clientes</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        @*header*@
+        <div class="card-header bg-primary text-white text-center">
+            <h3><strong>Clientes</strong></h3>
+        </div>
+        <div class="row p-3">
+            <div class="col-md-5">
+                <label for="Filtro" class="form-label"><strong>Filtrar por:</strong></label>
+                <InputSelect id="filtro" class="form-select" @bind-Value="filtro">
+                    <option value="" disabled>Seleccionar</option>
+                    <option value="id">ClienteId</option>
+                    <option value="Nombres">Nombres</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                </InputSelect>
+
+            </div>
+            <div class="col-md-7">
+                <label for="ValorFiltro" class="form-label"><strong>B&uacute;squeda:</strong></label>
+                <div class="input-group">
+                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
+                    <button @onclick="Buscar" class="btn btn-primary" type="button">
+                        <span class="bi bi-search"></span> Buscar
+                    </button>
+                </div>
+            </div>
+            <div class="text-left">
+                <a href="/Cliente/Create" class="btn btn-success bi bi-plus-circle-fill "> Crear</a>
+            </div>
+        </div>
+        @*body*@
+        <div class="card-body">
+            <table class="table  table-bordered text-center">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th>ClienteId</th>
+                        <th>Nombre</th>
+                        <th>WhatsApp</th>
+                        <th> ver</th>
+                        <th> Modificar</th>
+                        <th> Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cliente in clientes)
+                    {
+
+                        <tr>
+                            <td>@cliente.ClientesId</td>
+                            <td>@cliente.Nombres</td>
+                            <td>@cliente.WhatsApp</td>
+                            <td class="form-text">
+                                <a href="/Cliente/Details/@cliente.ClientesId" class="btn btn-success bi bi-eye btn-radius"></a>
+                            </td>
+                            <td class="text">
+                                <a href="/Cliente/Edit/@cliente.ClientesId" class="btn btn-secondary bi bi-pencil-fill btn-radius"></a>
+                            </td>
+                            <td class="text">
+                                <a href="/Cliente/Delete/@cliente.ClientesId" class="btn btn-danger bi bi-trash-fill btn-radius"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@code {
+    public List<Clientes> clientes = new List<Clientes>();
+    private string filtro = "";
+    private string valorFiltro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        clientes = await clienteService.Listar(c => true);
+    }
+
+    private async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int ClienteId))
+            {
+                clientes = await clienteService.Listar(c => c.ClientesId == ClienteId);
+            }
+            else if (filtro == "Nombres")
+            {
+                clientes = await clienteService.Listar(c => c.Nombres.ToLower().Contains(valorFiltro.ToLower()));
+            }
+            else if (filtro == "WhatsApp")
+            {
+                clientes = await clienteService.Listar(c => c.WhatsApp.ToLower().Contains(valorFiltro.ToLower()));
+            }
+
+        }
+
+    }
+}
+
