@@ -6,6 +6,7 @@
 <PageTitle>Crear Prioridad</PageTitle>
 <EditForm Model="Prioridad" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
+    <Toasts class="p-3" Messages="MensajeToast" Placement="ToastsPlacement.TopRight" />
     <div class="card shadow-lg border-0 rounded" style="background-color: #f8f9fa;">
         <div class="card-header bg-primary text-white" style="text-align: center;">
             <h3> <i class="fas fa-clipboard-list"></i> Registro de Prioridades</h3>
@@ -40,7 +41,23 @@
 @code {
     public int PrioridadId { get; set; }
     public Prioridades Prioridad { get; set; } = new Prioridades();
+    List<ToastMessage> MensajeToast = new List<ToastMessage>();
     private bool Existe = false;
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string mensaje)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Notificación",
+            HelpText = $"{DateTime.Now}",
+            Message = mensaje,
+        };
+
+    private void Mensaje(ToastType toastType, string mensaje)
+    {
+        MensajeToast.Add(CreateToastMessage(toastType, mensaje));
+    }
+
 
     public void Nuevo()
     {
@@ -64,6 +81,7 @@
         var guardo = await PrioridadService.Guardar(Prioridad);
         if (guardo)
         {
+            Mensaje(ToastType.Success, "prioridad guardada correctamente.");
             Nuevo();
         }
     }
