@@ -112,12 +112,17 @@ namespace RegistrosTecnico.Migrations
                     b.Property<double>("Monto")
                         .HasColumnType("REAL");
 
+                    b.Property<int>("PrioridadId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("TecnicoId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("TrabajoId");
 
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("PrioridadId");
 
                     b.HasIndex("TecnicoId");
 
@@ -143,6 +148,12 @@ namespace RegistrosTecnico.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("RegistrosTecnico.Models.Prioridades", "Prioridades")
+                        .WithMany()
+                        .HasForeignKey("PrioridadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RegistrosTecnico.Models.Tecnicos", "Tecnicos")
                         .WithMany()
                         .HasForeignKey("TecnicoId")
@@ -150,6 +161,8 @@ namespace RegistrosTecnico.Migrations
                         .IsRequired();
 
                     b.Navigation("Cliente");
+
+                    b.Navigation("Prioridades");
 
                     b.Navigation("Tecnicos");
                 });
