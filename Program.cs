@@ -19,6 +19,7 @@ builder.Services.AddScoped<TecnicoService>();
 builder.Services.AddScoped<TiposTecnicoServices>();
 builder.Services.AddScoped<ClientesServices>();
 builder.Services.AddScoped<TrabajoService>();
+builder.Services.AddScoped<PrioridadService>();
 
 
 
