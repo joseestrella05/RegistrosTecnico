@@ -1,0 +1,114 @@
+﻿@page "/Prioridad/Index"
+@inject PrioridadService PrioridadesService;
+@rendermode InteractiveServer
+
+<EditForm Model="ListaPrioridades" class="border shadow-lg p-3 rounded">
+    @*Header*@
+    <div class="card-header bg-primary text-white text-center py-2 rounded">
+        <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Prioridades</h3>
+    </div>
+    <div class="card-body">
+
+        <div class="row mb-3 align-items-end">
+            <div class="col-md-3">
+                <label for="Filtro" class="form-label">Filtrar por:</label>
+                <select @bind="filtro" class="form-select">
+                    <option value="id">ID</option>
+                    <option value="descripcion">Descripci&oacuten</option>
+                    <option value="Tiempo">tiempo</option>
+                </select>
+            </div>
+            <div class="col-md-7">
+                <label for="ValorFiltro" class="form-label"><strong>B&uacute;squeda:</strong></label>
+                <div class="input-group">
+                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
+                    <button @onclick="Buscar" class="btn btn-primary" type="button">
+                        <span class="bi bi-search"></span> Buscar
+                    </button>
+                </div>
+            </div>
+            <div class="text-left">
+                <a href="/Prioridad/Create" class="btn btn-success" type="button"><span class="bi bi-floppy"></span> Crear </a>
+            </div>
+        </div>
+    </div>
+    @*Body*@
+    <table class="table table-bordered text-center">
+        <thead class="bg-primary text-white">
+            <tr>
+                <th>PrioridadId</th>
+                <th>Descripci&oacute;n</th>
+                <th>Tiempo</th>
+                <th>Ver</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var prioridad in ListaPrioridades)
+            {
+                <tr>
+                    <td>@prioridad.PrioridadId</td>
+                    <td>@prioridad.Descripcion</td>
+                    <td>@prioridad.Tiempo</td>
+                    <td>
+                        <a class="btn btn-outline-primary" href="/Prioridad/Details/@prioridad.PrioridadId">
+                            <span class="bi bi-eye"></span>
+                        </a>
+                    </td>
+
+                    <td>
+                        <a class="btn btn-outline-success" href="/Prioridad/Edit/@prioridad.PrioridadId">
+                            <span class="bi bi-marker-tip"></span>
+                        </a>
+                    </td>
+
+                    <td>
+                        <a class="btn btn-outline-warning" href="/Prioridad/Delete/@prioridad.PrioridadId">
+                            <span class="bi bi-dash-circle-fill"></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</EditForm>
+
+@code {
+    public Prioridades Prioridades = new Prioridades();
+
+    public List<Prioridades> ListaPrioridades = new List<Prioridades>();
+
+    private string filtro = "Id";
+    private string valorFiltro = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaPrioridades = await PrioridadesService.Listar(c => true);
+    }
+
+    private async Task Buscar()
+    {
+        if (valorFiltro.Trim() != "")
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int PrioridadId))
+            {
+                ListaPrioridades = await PrioridadesService.Listar(p => p.PrioridadId == PrioridadId);
+            }
+            else if (filtro == "descripcion")
+            {
+                ListaPrioridades = await PrioridadesService.Listar(p => p.Descripcion == valorFiltro);
+            }
+            else if (filtro == "Tiempo" && int.TryParse(valorFiltro, out int tiempo))
+            {
+                ListaPrioridades = await PrioridadesService.Listar(p => p.Tiempo == tiempo);
+            }
+        }
+        else
+        {
+            ListaPrioridades = await PrioridadesService.Listar(p => true);
+        }
+    }
+
+}
