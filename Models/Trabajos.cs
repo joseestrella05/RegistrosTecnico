@@ -30,4 +30,11 @@ public class Trabajos
     [Required(ErrorMessage = "Debe elegir una prioridad")]
     public int PrioridadId { get; set; }
     public Prioridades? Prioridades { get; set; }
+
+    [InverseProperty("Trabajos")]
+    public virtual ICollection<TrabajoDestalle> TrabajoDetalle { get; set; } = new List<TrabajoDestalle>();
+
+    [ForeignKey("ArticuloId")]
+    [InverseProperty("Trabajos")]
+    public virtual Articulos Articulos { get; set; } = null!;
 }
