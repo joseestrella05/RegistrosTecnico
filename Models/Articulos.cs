@@ -7,13 +7,20 @@ namespace RegistrosTecnico.Models
     {
         [Key]
         public int ArticuloId { get; set; }
-        public string Depcripcion { get; set; }
-        public double Costo { get; set; }
-        public double Precio { get; set; }
-        public int Existencia { get; set; }
 
-        [InverseProperty("Articulos")]
-        public virtual ICollection<Trabajos> Trabajos { get; set; } = new List<Trabajos>();
+        [Required(ErrorMessage = "Campo obligatorio")]
+        [StringLength(100)]
+        [RegularExpression("^[a-zA-ZÀ-ÿ\\s]+$", ErrorMessage = "Solo se permiten letras.")]
+        public string? Descripcion { get; set; }
+
+        [Required(ErrorMessage = "Campo obligatorio")]
+        public double? Costo { get; set; }
+
+        [Required(ErrorMessage = "Campo obligatorio")]
+        public double? Precio { get; set; }
+
+        [Required(ErrorMessage = "Campo obligatorio")]
+        public int? Existencia { get; set; }
 
     }
 

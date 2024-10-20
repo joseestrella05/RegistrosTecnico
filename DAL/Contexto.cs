@@ -4,41 +4,25 @@ using RegistrosTecnico.Models;
 
 namespace RegistrosTecnico.DAL;
 
-public class Contexto : DbContext
+public class Contexto(DbContextOptions<Contexto> options) : DbContext(options)
 {
-    public Contexto(DbContextOptions<Contexto> options) : base(options){}
-
-    public virtual DbSet<Tecnicos> Tecnicos { get; set; }
-    public virtual DbSet<TiposTecnicos> TiposTecnicos { get; set; }
-    public virtual DbSet<Clientes> Clientes { get; set; }
-    public virtual DbSet<Trabajos> Trabajos { get; set; }
-	public virtual DbSet<Prioridades> Prioridades { get; set; }
-
-    public virtual DbSet<TrabajoDestalle> TrabajoDestalles { get; set; }
+    public DbSet<Tecnicos> Tecnicos { get; set; }
+    public DbSet<TiposTecnicos> TiposTecnicos { get; set; }
+    public DbSet<Clientes> Clientes { get; set; }
+    public DbSet<Trabajos> Trabajos { get; set; }
+    public DbSet<Prioridades> Prioridades { get; set; }
+    public DbSet<Articulos> Articulos { get; set; }
+    public DbSet<TrabajosDetalles> TrabajosDetalles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Articulos>().HasData(
-            new List<Articulos>()
-            {
-                new()
-                {
-                    ArticuloId = 1,
-                    Depcripcion = "Tornillo",
-                    Costo = 100,
-                    Precio = 150,
-                    Existencia = 2900,
-                },
-                new()
-                {
-                     ArticuloId = 2,
-                    Depcripcion = "Cable de red",
-                    Costo = 120,
-                    Precio = 200,
-                    Existencia = 4999,
-                }
-            }
-        );
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Articulos>().HasData(new List<Articulos>()
+        {
+            new Articulos() {ArticuloId = 1, Descripcion = "Cable Lan",
+                Costo = 100, Precio = 40,Existencia = 20},
+            
+        });
     }
+
 }

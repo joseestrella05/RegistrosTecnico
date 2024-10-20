@@ -4,10 +4,11 @@
 @inject TrabajoService trabajoService
 @inject ClientesServices clienteService
 @inject PrioridadService prioridadService
+@inject ArticuloService ArticulosServices
 @inject NavigationManager navigation
 
 <PageTitle>Editar Trabajo</PageTitle>
-<EditForm Model="Trabajo" OnValidSubmit="Modificar">
+<EditForm Model="Trabajo" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -55,7 +56,7 @@
                 <label class="form-label">Prioridad</label>
                 <InputSelect @bind-Value="Trabajo.PrioridadId" class="form-control">
                     <option value="0">Seleciona una prioridad</option>
-                    @foreach (var Prioridad in prioridades)
+                    @foreach (var Prioridad in Prioridades)
                     {
                         <option value="@Prioridad.PrioridadId">@Prioridad.Descripcion</option>
                     }
@@ -65,6 +66,43 @@
                 <label class="form-label" for="monto">Monto</label>
                 <InputNumber @bind-Value="Trabajo.Monto" class="form-control" />
                 <ValidationMessage For="@(() => Trabajo.Monto)" />
+
+                <div class="border border-success p-3 mt-3">
+                    <TrabajoDestalle ListArticulos="ListArticulos"
+                                     ArticuloId="Detalles.ArticuloId"
+                                     Cantidad="Detalles.Cantidad"
+                                     precio="Detalles.Precio"
+                                     ArticuloSeleccionado="AgregarDetalle" />
+
+                    <div>
+                        <table class="table table-light">
+                            <thead class="table table-striped">
+                                <tr class="Text-center">
+                                    <th>Id Articulo</th>
+                                    <th>Cantidad Utilizada</th>
+                                    <th>Precio</th>
+                                    <th>Total</th>
+                                    <th>Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var Detalle in Trabajo.TrabajosDetalles)
+                                {
+                                    <tr class="Text-center">
+                                        <th>@Detalle.ArticuloId</th>
+                                        <th>@Detalle.Cantidad</th>
+                                        <th>@Detalle.Precio</th>
+                                        <th>@(Detalle.Precio * Detalle.Cantidad)</th>
+                                        <th>
+                                            <button type="button" @onclick=" ()=> Eliminar(Detalle)" class="btn btn-outline-danger bi bi-trash mt-2"> Remover</button>
+                                        </th>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
 
 
             </div>
@@ -87,21 +125,60 @@
     public Trabajos Trabajo { get; set; } = new Trabajos();
     public List<Tecnicos> Tecnicos = new List<Tecnicos>();
     public List<Clientes> Clientes = new List<Clientes>();
-    public List<Prioridades> prioridades = new List<Prioridades>();
+    public List<Prioridades> Prioridades = new List<Prioridades>();
+    public TrabajosDetalles Detalles { get; set; } = new TrabajosDetalles();
+    public List<Articulos> ListArticulos { get; set; } = [];
 
+
+    string Mensaje { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         Trabajo = await trabajoService.Buscar(TrabajoId);
         Tecnicos = await tecnicoService.Listar(a => true);
         Clientes = await clienteService.Listar(a => true);
-        prioridades = await prioridadService.Listar(a => true);
+        Prioridades = await prioridadService.Listar(p => true);
+        ListArticulos = await ArticulosServices.Listar(A => true);
+
     }
-    public async Task Modificar()
+    private async Task AgregarDetalle((Articulos articulos, int cantidad) selection)
+    {
+        var ArticuloExiste = Trabajo.TrabajosDetalles
+        .FirstOrDefault(A => A.ArticuloId == selection.articulos.ArticuloId);
+        if (ArticuloExiste != null)
+        {
+            ArticuloExiste.Cantidad += selection.cantidad;
+        }
+        else
+        {
+            var TrabajosDetalle = new TrabajosDetalles
+                {
+                    ArticuloId = selection.articulos.ArticuloId,
+                    Cantidad = selection.cantidad,
+                    Precio = selection.articulos.Precio,
+                    Costo = selection.articulos.Costo
+                };
+            Trabajo.TrabajosDetalles.Add(TrabajosDetalle);
+            Detalles = new TrabajosDetalles();
+            await Task.CompletedTask;
+        }
+    }
+    public async Task Eliminar(TrabajosDetalles detalle)
+    {
+        Trabajo.TrabajosDetalles.Remove(detalle);
+        Detalles.Cantidad = detalle.Cantidad;
+        Detalles.ArticuloId = detalle.ArticuloId;
+    }
+
+    public async Task Guardar()
     {
         await trabajoService.Guardar(Trabajo);
-        navigation.NavigateTo("/RegistroTrabajos/index");
+        navigation.NavigateTo("/Trabajo/index");
 
+    }
+    public void Volver()
+    {
+        navigation.NavigateTo("/Trabajo/index");
     }
 
 }

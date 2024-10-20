@@ -30,17 +30,21 @@ namespace RegistrosTecnico.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ArticuloId"));
 
-                    b.Property<double>("Costo")
+                    b.Property<double?>("Costo")
+                        .IsRequired()
                         .HasColumnType("float");
 
-                    b.Property<string>("Depcripcion")
+                    b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Existencia")
+                    b.Property<int?>("Existencia")
+                        .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<double>("Precio")
+                    b.Property<double?>("Precio")
+                        .IsRequired()
                         .HasColumnType("float");
 
                     b.HasKey("ArticuloId");
@@ -51,18 +55,26 @@ namespace RegistrosTecnico.Migrations
                         new
                         {
                             ArticuloId = 1,
-                            Costo = 100.0,
-                            Depcripcion = "Tornillo",
-                            Existencia = 2900,
-                            Precio = 150.0
+                            Costo = 30.0,
+                            Descripcion = "Pasta termica",
+                            Existencia = 20,
+                            Precio = 40.0
                         },
                         new
                         {
                             ArticuloId = 2,
-                            Costo = 120.0,
-                            Depcripcion = "Cable de red",
-                            Existencia = 4999,
-                            Precio = 200.0
+                            Costo = 100.0,
+                            Descripcion = "Memoria RAM",
+                            Existencia = 10,
+                            Precio = 150.0
+                        },
+                        new
+                        {
+                            ArticuloId = 3,
+                            Costo = 80.0,
+                            Descripcion = "Tarjeta grafica",
+                            Existencia = 12,
+                            Precio = 130.0
                         });
                 });
 
@@ -148,36 +160,6 @@ namespace RegistrosTecnico.Migrations
                     b.ToTable("TiposTecnicos");
                 });
 
-            modelBuilder.Entity("RegistrosTecnico.Models.TrabajoDestalle", b =>
-                {
-                    b.Property<int>("DetalleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetalleId"));
-
-                    b.Property<int>("ArticuloId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cantidad")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Costo")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Precio")
-                        .HasColumnType("float");
-
-                    b.Property<int>("TrabajoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DetalleId");
-
-                    b.HasIndex("TrabajoId");
-
-                    b.ToTable("TrabajoDestalles");
-                });
-
             modelBuilder.Entity("RegistrosTecnico.Models.Trabajos", b =>
                 {
                     b.Property<int>("TrabajoId")
@@ -185,9 +167,6 @@ namespace RegistrosTecnico.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrabajoId"));
-
-                    b.Property<int>("ArticuloId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("ClienteId")
                         .IsRequired()
@@ -204,15 +183,14 @@ namespace RegistrosTecnico.Migrations
                     b.Property<double>("Monto")
                         .HasColumnType("float");
 
-                    b.Property<int>("PrioridadId")
+                    b.Property<int?>("PrioridadId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int>("TecnicoId")
                         .HasColumnType("int");
 
                     b.HasKey("TrabajoId");
-
-                    b.HasIndex("ArticuloId");
 
                     b.HasIndex("ClienteId");
 
@@ -221,6 +199,38 @@ namespace RegistrosTecnico.Migrations
                     b.HasIndex("TecnicoId");
 
                     b.ToTable("Trabajos");
+                });
+
+            modelBuilder.Entity("RegistrosTecnico.Models.TrabajosDetalles", b =>
+                {
+                    b.Property<int>("DetalleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetalleId"));
+
+                    b.Property<int>("ArticuloId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("Costo")
+                        .IsRequired()
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Precio")
+                        .IsRequired()
+                        .HasColumnType("float");
+
+                    b.Property<int>("TrabajoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DetalleId");
+
+                    b.HasIndex("TrabajoId");
+
+                    b.ToTable("TrabajosDetalles");
                 });
 
             modelBuilder.Entity("RegistrosTecnico.Models.Tecnicos", b =>
@@ -234,32 +244,15 @@ namespace RegistrosTecnico.Migrations
                     b.Navigation("TipoTecnico");
                 });
 
-            modelBuilder.Entity("RegistrosTecnico.Models.TrabajoDestalle", b =>
-                {
-                    b.HasOne("RegistrosTecnico.Models.Trabajos", "Trabajos")
-                        .WithMany("TrabajoDetalle")
-                        .HasForeignKey("TrabajoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Trabajos");
-                });
-
             modelBuilder.Entity("RegistrosTecnico.Models.Trabajos", b =>
                 {
-                    b.HasOne("RegistrosTecnico.Models.Articulos", "Articulos")
-                        .WithMany("Trabajos")
-                        .HasForeignKey("ArticuloId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("RegistrosTecnico.Models.Clientes", "Cliente")
                         .WithMany()
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RegistrosTecnico.Models.Prioridades", "Prioridades")
+                    b.HasOne("RegistrosTecnico.Models.Prioridades", "Prioridad")
                         .WithMany()
                         .HasForeignKey("PrioridadId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -271,23 +264,25 @@ namespace RegistrosTecnico.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Articulos");
-
                     b.Navigation("Cliente");
 
-                    b.Navigation("Prioridades");
+                    b.Navigation("Prioridad");
 
                     b.Navigation("Tecnicos");
                 });
 
-            modelBuilder.Entity("RegistrosTecnico.Models.Articulos", b =>
+            modelBuilder.Entity("RegistrosTecnico.Models.TrabajosDetalles", b =>
                 {
-                    b.Navigation("Trabajos");
+                    b.HasOne("RegistrosTecnico.Models.Trabajos", null)
+                        .WithMany("TrabajosDetalles")
+                        .HasForeignKey("TrabajoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RegistrosTecnico.Models.Trabajos", b =>
                 {
-                    b.Navigation("TrabajoDetalle");
+                    b.Navigation("TrabajosDetalles");
                 });
 #pragma warning restore 612, 618
         }

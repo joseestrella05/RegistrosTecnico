@@ -19,7 +19,7 @@ namespace RegistrosTecnico.Migrations
                 {
                     ArticuloId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Depcripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Costo = table.Column<double>(type: "float", nullable: false),
                     Precio = table.Column<double>(type: "float", nullable: false),
                     Existencia = table.Column<int>(type: "int", nullable: false)
@@ -102,18 +102,11 @@ namespace RegistrosTecnico.Migrations
                     Monto = table.Column<double>(type: "float", nullable: false),
                     TecnicoId = table.Column<int>(type: "int", nullable: false),
                     ClienteId = table.Column<int>(type: "int", nullable: false),
-                    PrioridadId = table.Column<int>(type: "int", nullable: false),
-                    ArticuloId = table.Column<int>(type: "int", nullable: false)
+                    PrioridadId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Trabajos", x => x.TrabajoId);
-                    table.ForeignKey(
-                        name: "FK_Trabajos_Articulos_ArticuloId",
-                        column: x => x.ArticuloId,
-                        principalTable: "Articulos",
-                        principalColumn: "ArticuloId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Trabajos_Clientes_ClienteId",
                         column: x => x.ClienteId,
@@ -135,7 +128,7 @@ namespace RegistrosTecnico.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrabajoDestalles",
+                name: "TrabajosDetalles",
                 columns: table => new
                 {
                     DetalleId = table.Column<int>(type: "int", nullable: false)
@@ -143,14 +136,14 @@ namespace RegistrosTecnico.Migrations
                     TrabajoId = table.Column<int>(type: "int", nullable: false),
                     ArticuloId = table.Column<int>(type: "int", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    Precio = table.Column<double>(type: "float", nullable: false),
-                    Costo = table.Column<double>(type: "float", nullable: false)
+                    Costo = table.Column<double>(type: "float", nullable: false),
+                    Precio = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrabajoDestalles", x => x.DetalleId);
+                    table.PrimaryKey("PK_TrabajosDetalles", x => x.DetalleId);
                     table.ForeignKey(
-                        name: "FK_TrabajoDestalles_Trabajos_TrabajoId",
+                        name: "FK_TrabajosDetalles_Trabajos_TrabajoId",
                         column: x => x.TrabajoId,
                         principalTable: "Trabajos",
                         principalColumn: "TrabajoId",
@@ -159,27 +152,18 @@ namespace RegistrosTecnico.Migrations
 
             migrationBuilder.InsertData(
                 table: "Articulos",
-                columns: new[] { "ArticuloId", "Costo", "Depcripcion", "Existencia", "Precio" },
+                columns: new[] { "ArticuloId", "Costo", "Descripcion", "Existencia", "Precio" },
                 values: new object[,]
                 {
-                    { 1, 100.0, "Tornillo", 2900, 150.0 },
-                    { 2, 120.0, "Cable de red", 4999, 200.0 }
+                    { 1, 30.0, "Pasta termica", 20, 40.0 },
+                    { 2, 100.0, "Memoria RAM", 10, 150.0 },
+                    { 3, 80.0, "Tarjeta grafica", 12, 130.0 }
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tecnicos_TipoId",
                 table: "Tecnicos",
                 column: "TipoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TrabajoDestalles_TrabajoId",
-                table: "TrabajoDestalles",
-                column: "TrabajoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Trabajos_ArticuloId",
-                table: "Trabajos",
-                column: "ArticuloId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trabajos_ClienteId",
@@ -195,19 +179,24 @@ namespace RegistrosTecnico.Migrations
                 name: "IX_Trabajos_TecnicoId",
                 table: "Trabajos",
                 column: "TecnicoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrabajosDetalles_TrabajoId",
+                table: "TrabajosDetalles",
+                column: "TrabajoId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TrabajoDestalles");
+                name: "Articulos");
+
+            migrationBuilder.DropTable(
+                name: "TrabajosDetalles");
 
             migrationBuilder.DropTable(
                 name: "Trabajos");
-
-            migrationBuilder.DropTable(
-                name: "Articulos");
 
             migrationBuilder.DropTable(
                 name: "Clientes");
