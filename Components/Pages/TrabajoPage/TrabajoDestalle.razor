@@ -13,7 +13,7 @@
 	<InputNumber class="form-control" @bind-Value="Cantidad" min="0.00$"></InputNumber>
 
 	<label class="col-form-label input-group-text">Precio </label>
-	<InputNumber class="form-control" @bind-Value="precio" min="0.00$" readonly disabled></InputNumber>
+	<InputNumber class="form-control" @bind-Value="precio" placeholder="0.00$" readonly disabled></InputNumber>
 	<button type="button" class="btn btn-outline-success bi bi-plus " @onclick="ElegirArticulo">Agregar detalle</button>
 
 </div>
