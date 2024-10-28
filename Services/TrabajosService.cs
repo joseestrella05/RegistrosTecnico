@@ -6,39 +6,42 @@ using System.Linq.Expressions;
 
 namespace RegistrosTecnico.Services;
 
-public class TrabajoService(Contexto contexto)
+public class TrabajoService(IDbContextFactory<Contexto> DbFactory)
 {
-    private readonly Contexto _contexto = contexto;
     public async Task<bool> ExisteDescripcion(String descripcion)
     {
-        return await _contexto.Trabajos.AnyAsync(T => T.Descripcion == descripcion);
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Trabajos.AnyAsync(T => T.Descripcion == descripcion);
     }
 
     public async Task<bool> ExisteId(int id)
     {
-        return await _contexto.Trabajos.AnyAsync(t => t.TrabajoId == id);
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Trabajos.AnyAsync(t => t.TrabajoId == id);
     }
 
     private async Task<bool> Insertar(Trabajos trabajo)
     {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
         await AfectarCobro(trabajo.TrabajosDetalles.ToArray());
-        await _contexto.Trabajos.AddAsync(trabajo);
-        return await _contexto.SaveChangesAsync() > 0;
+        await contexto.Trabajos.AddAsync(trabajo);
+        return await contexto.SaveChangesAsync() > 0;
     }
 
     private async Task<bool> Modificar(Trabajos trabajos)
     {
-        var trabajoOriginal = await _contexto.Trabajos
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var trabajoOriginal = await contexto.Trabajos
         .Include(t => t.TrabajosDetalles)
-        .AsNoTracking() // 
+        .AsNoTracking()  
         .FirstOrDefaultAsync(t => t.TrabajoId == trabajos.TrabajoId);
 
         await AfectarCobro(trabajoOriginal.TrabajosDetalles.ToArray(), false);
 
         await AfectarCobro(trabajos.TrabajosDetalles.ToArray());
 
-        _contexto.Update(trabajos);
-        return await _contexto.SaveChangesAsync() > 0;
+        contexto.Update(trabajos);
+        return await contexto.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> Guardar(Trabajos trabajos)
@@ -51,20 +54,22 @@ public class TrabajoService(Contexto contexto)
 
     public async Task<bool> Eliminar(int id)
     {
-        var trabajo = _contexto.Trabajos.Find(id);
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var trabajo = contexto.Trabajos.Find(id);
 
         await AfectarCobro(trabajo.TrabajosDetalles.ToArray(), false);
 
-        _contexto.TrabajosDetalles.RemoveRange(trabajo.TrabajosDetalles);
-        _contexto.Trabajos.Remove(trabajo);
+        contexto.TrabajosDetalles.RemoveRange(trabajo.TrabajosDetalles);
+        contexto.Trabajos.Remove(trabajo);
 
-        var cantidad = await _contexto.SaveChangesAsync();
+        var cantidad = await contexto.SaveChangesAsync();
         return cantidad > 0;
     }
 
     public async Task<Trabajos?> Buscar(int id)
     {
-        return await _contexto.Trabajos
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Trabajos
             .Include(t => t.Tecnicos)
             .Include(c => c.Cliente)
             .Include(p => p.Prioridad)
@@ -74,7 +79,8 @@ public class TrabajoService(Contexto contexto)
 
     public async Task<List<Trabajos>> Listar(Expression<Func<Trabajos, bool>> criterio)
     {
-        return await _contexto.Trabajos
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Trabajos
             .Include(t => t.Tecnicos)
             .Include(c => c.Cliente)
             .Include(p => p.Prioridad)
@@ -86,10 +92,11 @@ public class TrabajoService(Contexto contexto)
 
     private async Task AfectarCobro(TrabajosDetalles[] detalles, bool resta = true)
     {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
 
         foreach (var item in detalles)
         {
-            var Articulo = await _contexto.Articulos.SingleAsync(p => p.ArticuloId == item.ArticuloId);
+            var Articulo = await contexto.Articulos.SingleAsync(p => p.ArticuloId == item.ArticuloId);
             if (resta)
             {
                 Articulo.Existencia -= item.Cantidad;
