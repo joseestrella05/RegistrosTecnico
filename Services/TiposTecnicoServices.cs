@@ -5,26 +5,26 @@ using System.Linq.Expressions;
 
 namespace RegistrosTecnico.Services;
 
-public class TiposTecnicoServices
+public class TiposTecnicoServices(IDbContextFactory<Contexto> DbFactory)
 {
-    private readonly Contexto _context;
-    public TiposTecnicoServices(Contexto context) => _context = context;
-
     public async Task<bool> Existe(int id)
     {
-        return await _context.TiposTecnicos.AnyAsync(t => t.TipoId == id);
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.TiposTecnicos.AnyAsync(t => t.TipoId == id);
     }
 
     public async Task<bool> Insertar(TiposTecnicos tecnicos)
     {
-        _context.TiposTecnicos.Add(tecnicos);
-        return await _context.SaveChangesAsync() > 0;
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        contexto.TiposTecnicos.Add(tecnicos);
+        return await contexto.SaveChangesAsync() > 0;
     }
 
     private async Task<bool> Modificar(TiposTecnicos tecnicos)
     {
-        _context.TiposTecnicos.Update(tecnicos);
-        return await _context.SaveChangesAsync() > 0;
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        contexto.TiposTecnicos.Update(tecnicos);
+        return await contexto.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> Guardar(TiposTecnicos tecnicos)
@@ -37,7 +37,8 @@ public class TiposTecnicoServices
 
     public async Task<bool> Eliminar(int id)
     {
-        var Tipo = await _context.TiposTecnicos.
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var Tipo = await contexto.TiposTecnicos.
             Where(t => t.TipoId == id).
             ExecuteDeleteAsync();
         return Tipo > 0;
@@ -45,24 +46,33 @@ public class TiposTecnicoServices
 
     public async Task<TiposTecnicos> Buscar(int id)
     {
-        return await _context.TiposTecnicos
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.TiposTecnicos
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.TipoId == id);
     }
 
     public async Task<List<TiposTecnicos>> Listar(Expression<Func<TiposTecnicos, bool>> cristerio)
     {
-        return _context.TiposTecnicos.AsNoTracking().Where(cristerio).ToList();
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return contexto.TiposTecnicos
+            .AsNoTracking()
+            .Where(cristerio).ToList();
     }
 
     public async Task<List<TiposTecnicos>> ListarTipoTecnicos()
     {
-        return await _context.Tecnicos.AsNoTracking().Select(t => t.TipoTecnico).ToListAsync();
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Tecnicos
+            .AsNoTracking().Select(t => t.TipoTecnico)
+            .ToListAsync();
     }
 
     public async Task<bool> ExisteTipoTecnicoDescripcion(string descripcion)
     {
-        return await _context.TiposTecnicos.AnyAsync(t => t.Descripcion == descripcion);
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.TiposTecnicos
+            .AnyAsync(t => t.Descripcion == descripcion);
     }
 
 

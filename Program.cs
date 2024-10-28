@@ -11,7 +11,8 @@ builder.Services.AddRazorComponents()
 
 //Inyeccción del contexto
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
-builder.Services.AddDbContext<Contexto>(o => o.UseSqlServer(ConStr));
+//builder.Services.AddDbContext<Contexto>(o => o.UseSqlServer(ConStr));
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 builder.Services.AddBlazorBootstrap();
 
 //Inyeccción del service
@@ -21,6 +22,8 @@ builder.Services.AddScoped<ClientesServices>();
 builder.Services.AddScoped<TrabajoService>();
 builder.Services.AddScoped<PrioridadService>();
 builder.Services.AddScoped<ArticuloService>();
+builder.Services.AddScoped<CotizacionServices>();
+builder.Services.AddScoped<CotizacionesDetalleService>();
 
 
 
