@@ -22,6 +22,8 @@ builder.Services.AddScoped<ClientesServices>();
 builder.Services.AddScoped<TrabajoService>();
 builder.Services.AddScoped<PrioridadService>();
 builder.Services.AddScoped<ArticuloService>();
+builder.Services.AddScoped<CotizacionServices>();
+builder.Services.AddScoped<CotizacionesDetalleService>();
 
 
 

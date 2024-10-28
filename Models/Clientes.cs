@@ -13,7 +13,7 @@ public class Clientes
     [RegularExpression(@"^\d+$", ErrorMessage = "Solo se permiten números.")]
     public string? WhatsApp { get; set; }
 
-    [InverseProperty("Clientes")]
+   
     public virtual ICollection<Cotizaciones> Cotizaciones { get; set; } = new List<Cotizaciones>();
 
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using RegistrosTecnico.Models;
+using System.Net;
 
 namespace RegistrosTecnico.DAL;
 
@@ -13,6 +14,8 @@ public class Contexto(DbContextOptions<Contexto> options) : DbContext(options)
     public DbSet<Prioridades> Prioridades { get; set; }
     public DbSet<Articulos> Articulos { get; set; }
     public DbSet<TrabajosDetalles> TrabajosDetalles { get; set; }
+    public virtual DbSet<Cotizaciones> Cotizaciones { get; set; }
+    public virtual DbSet<CotizacionDetalles> CotizacionDetalles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

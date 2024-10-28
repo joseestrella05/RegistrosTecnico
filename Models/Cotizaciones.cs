@@ -12,19 +12,18 @@ public class Cotizaciones
     public DateTime Fecha { get; set; } = DateTime.Now;
 
     [Required]
-    public int ClienteID { get; set; }
+    public int ClienteId { get; set; }
 
     [Required]
-    public string? Oservacion { get; set;}
+    public string? Observacion { get; set;}
 
     [Required]
-    public double Monto { get; set; }
+    public double? Monto { get; set; }
 
-    [InverseProperty("Cotizaciones")]
+    
     public virtual ICollection<CotizacionDetalles> ContizacionDetalles { get; set; } = new List<CotizacionDetalles>();
 
     [ForeignKey("Clientes")]
-    [InverseProperty("Cotizaciones")]
     public virtual Clientes Cliente { get; set; } = null!;
 
 }

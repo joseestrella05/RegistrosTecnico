@@ -10,13 +10,17 @@ public class CotizacionDetalles
 
     public int CotizacionId { get; set; }
 
+    [ForeignKey("Articulo")]
     public int ArticuloId { get; set; }
+    public virtual Articulos? Articulos { get; set; }
 
     public int Cantidad { get; set; }
 
     public double? Precio { get; set; }
 
     [ForeignKey("CotizacionId")]
-    [InverseProperty("CotizacionDetalles")]
+   
     public virtual Cotizaciones Cotizaciones { get; set; } = null!;
+
+   
 }
