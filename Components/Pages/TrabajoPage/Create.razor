@@ -17,67 +17,74 @@
                 <h2 class="card-title">Crear Trabajo</h2>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col">
-                        <label class="form-label">Cliente</label>
-                        <InputSelect class="form-select" @bind-Value="Trabajo.ClienteId">
-                            <option value="0">--Elija un cliente--</option>
-                            @foreach (var Cliente in Clientes)
-                            {
-                                <option value="@Cliente.ClientesId">@Cliente.Nombres</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => Trabajo.ClienteId)" />
-                    </div>
-                    <div class="col">
-                        <label class="form-label">Tecnico</label>
-                        <InputSelect class="form-select" @bind-Value="Trabajo.TecnicoId">
-                            <option value="0">--Elija una tecnico--</option>
-                            @foreach (var Tecnico in Tecnicos)
-                            {
-                                <option value="@Tecnico.TecnicoId">@Tecnico.Nombres (@Tecnico.TipoTecnico?.Descripcion)</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => Trabajo.TecnicoId)" />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label class="form-label">Prioridad</label>
-                        <InputSelect class="form-select" @bind-Value="Trabajo.PrioridadId">
-                            <option value="0">--Elija una prioridad--</option>
-                            @foreach (var Prioridad in Prioridades)
-                            {
-                                <option value="@Prioridad.PrioridadId">@Prioridad.Descripcion</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => Trabajo.PrioridadId)" />
-                    </div>
-                    <div class="col">
-                        <label class="form-label">Fecha del trabajo:</label>
-                        <InputDate class="form-control" @bind-Value="Trabajo.Fecha">@Trabajo.Fecha</InputDate>
-                        <ValidationMessage For="@(() => Trabajo.Fecha)" />
-                    </div>
-                    <div>
-                        <label class="form-label">Descripcion:</label>
-                        <InputText class="form-control" @bind-Value="Trabajo.Descripcion" />
-                        <ValidationMessage For="@(() => Trabajo.Descripcion)" />
-                    </div>
 
-                    <div>
-                        <label class="form-label">Precio del Trabajo:</label>
-                        <InputNumber class="form-control" @bind-Value="Trabajo.Monto" />
-                        <ValidationMessage For="@(() => Trabajo.Monto)" />
-                    </div>
+                @*Cliente*@
+
+                <div class="mb-3">
+                    <label class="form-label">Cliente</label>
+                    <InputSelect class="form-select" @bind-Value="Trabajo.ClienteId">
+                        <option value="0">--Elija un cliente--</option>
+                        @foreach (var Cliente in Clientes)
+                        {
+                            <option value="@Cliente.ClientesId">@Cliente.Nombres</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => Trabajo.ClienteId)" />
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tecnico</label>
+                    <InputSelect class="form-select" @bind-Value="Trabajo.TecnicoId">
+                        <option value="0">--Elija una tecnico--</option>
+                        @foreach (var Tecnico in Tecnicos)
+                        {
+                            <option value="@Tecnico.TecnicoId">@Tecnico.Nombres (@Tecnico.TipoTecnico?.Descripcion)</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => Trabajo.TecnicoId)" />
+                </div>
+    
+                
+                <div class="mb-3">
+                    <label class="form-label">Prioridad</label>
+                    <InputSelect class="form-select" @bind-Value="Trabajo.PrioridadId">
+                        <option value="0">--Elija una prioridad--</option>
+                        @foreach (var Prioridad in Prioridades)
+                        {
+                            <option value="@Prioridad.PrioridadId">@Prioridad.Descripcion</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => Trabajo.PrioridadId)" />
+                </div>
+
+                <div class="col">
+                    <label class="form-label">Fecha del trabajo:</label>
+                    <InputDate class="form-control" @bind-Value="Trabajo.Fecha">@Trabajo.Fecha</InputDate>
+                    <ValidationMessage For="@(() => Trabajo.Fecha)" />
+                </div>
+
+                <div>
+                    <label class="form-label">Descripcion:</label>
+                    <InputText class="form-control" @bind-Value="Trabajo.Descripcion" />
+                    <ValidationMessage For="@(() => Trabajo.Descripcion)" />
+                </div>
+
+                <div>
+                    <label class="form-label">Precio del Trabajo:</label>
+                    <InputNumber class="form-control" @bind-Value="Trabajo.Monto" />
+                    <ValidationMessage For="@(() => Trabajo.Monto)" />
+                </div>
+                
                 <div class="border border-success p-3 mt-3">
+                    <h5>Detalle del articulos</h5>
+
 					<TrabajoDestalle ListArticulos="ListArticulos"
                       ArticuloId="Detalles.ArticuloId"
                       Cantidad="Detalles.Cantidad"
                       precio="Detalles.Precio"
                       ArticuloSeleccionado="AgregarDetalle"/>
 
-                    <div>
+                    <hr>
                         <table class="table table-light">
                             <thead class="table table-striped">
                                 <tr class="Text-center">
@@ -85,7 +92,7 @@
                                     <th>Cantidad Utilizada</th>
                                     <th>Precio</th>
                                     <th>Total</th>
-                                    <th>Eliminar</th>
+                                    <th>Remover</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,9 +110,10 @@
                                 }
                             </tbody>
                         </table>
-                    </div>
-                     
+                    <hr />
+                    
                 </div>
+                    
               </div>
             <div class="card-footer">
                 <a href="/Trabajo/index" class="btn btn-outline-primary bi bi-arrow-left mt-2">Volver</a>
